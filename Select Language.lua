@@ -397,8 +397,8 @@ for _, key in ipairs(ORDER) do
     flagFrame.Parent = card
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
-    -- ให้มี margin ซ้ายขวา ไม่ให้กรอบเขียวลากยาวสุดเกินไป
-    flagFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
+    -- ปรับให้กรอบเขียวสั้นลง ฟิตกับรูปมากขึ้น
+    flagFrame.Size = UDim2.new(0.78, 0, 0.70, 0)
     flagFrame.BackgroundColor3 = THEME.BLACK
     flagFrame.BackgroundTransparency = 1
     flagFrame.BorderSizePixel = 0
@@ -420,9 +420,10 @@ for _, key in ipairs(ORDER) do
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
     nameLabel.Parent = card
-    nameLabel.AnchorPoint = Vector2.new(0.5, 1)
-    nameLabel.Position = UDim2.new(0.5, 0, 1, 0)
-    nameLabel.Size = UDim2.new(1, 0, 0.35, -4)
+    nameLabel.AnchorPoint = Vector2.new(0.5, 0)
+    -- เลื่อนลงมาจากธงให้มีระยะหายใจ
+    nameLabel.Position = UDim2.new(0.5, 0, 1, 4)
+    nameLabel.Size = UDim2.new(1, 0, 0.30, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextSize = 14
@@ -616,7 +617,8 @@ local function openConfirmDialog()
     permBox.AutoButtonColor = false
     permBox.ZIndex = 104
     permBox.Font = Enum.Font.GothamBold
-    permBox.TextSize = 20
+    permBox.TextSize = 24
+    permBox.TextScaled = true          -- ให้ emoji ✅ ขยายเต็มกรอบมากขึ้น
     permBox.TextColor3 = THEME.WHITE
     permBox.Text = ""
     corner(permBox, 6)
@@ -666,7 +668,7 @@ local function openConfirmDialog()
     local cancel = Instance.new("TextButton")
     cancel.Name = "Cancel"
     cancel.Parent = panel
-    cancel.BackgroundColor3 = THEME.RED   -- ปุ่มยกเลิกเป็นสีแดง
+    cancel.BackgroundColor3 = THEME.BLACK   -- กลับมาเป็นพื้นสีดำเหมือนเดิม
     cancel.BorderSizePixel = 0
     cancel.Size = UDim2.new(0.48, -10, 0, 38)
     cancel.Position = UDim2.new(1, -8, 1, -48)
