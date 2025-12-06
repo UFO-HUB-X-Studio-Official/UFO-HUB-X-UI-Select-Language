@@ -1,16 +1,75 @@
---===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download + Confirm) =====
+--===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download + Confirm + Save) =====
 -- LocalScript (StarterPlayerScripts / StarterGui)
 
 local Players          = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local HttpService      = game:GetService("HttpService")
 
 local lp = Players.LocalPlayer
+
+------------------------------------------------------------
+-- SAVE CONFIG
+------------------------------------------------------------
+local SAVE_DIR  = "UFO HUB X"
+local SAVE_FILE = SAVE_DIR .. "/Language.json"
+
+local function saveLangToDisk(state)
+    if not (writefile and makefolder) then
+        return
+    end
+
+    local ok, data = pcall(function()
+        return HttpService:JSONEncode({
+            ui        = state.ui,
+            game      = state.game,
+            permanent = state.permanent,
+        })
+    end)
+    if not ok then return end
+
+    pcall(function()
+        makefolder(SAVE_DIR)
+    end)
+
+    pcall(function()
+        writefile(SAVE_FILE, data)
+    end)
+end
+
+local function loadLangFromDisk()
+    if not readfile then return nil end
+
+    local ok, raw = pcall(function()
+        return readfile(SAVE_FILE)
+    end)
+    if not ok or type(raw) ~= "string" or raw == "" then
+        return nil
+    end
+
+    local ok2, decoded = pcall(function()
+        return HttpService:JSONDecode(raw)
+    end)
+    if ok2 and type(decoded) == "table" then
+        return decoded
+    end
+    return nil
+end
 
 ------------------------------------------------------------
 -- GLOBAL STATE (ภาษาที่ใช้ตอนนี้)
 ------------------------------------------------------------
 _G.UFOX_LANG = _G.UFOX_LANG or {}
 local LANG_STATE = _G.UFOX_LANG
+
+-- โหลดจากไฟล์ก่อน (ถ้ามี)
+do
+    local disk = loadLangFromDisk()
+    if disk then
+        LANG_STATE.ui        = disk.ui        or LANG_STATE.ui
+        LANG_STATE.game      = disk.game      or LANG_STATE.game
+        LANG_STATE.permanent = (disk.permanent ~= nil) and disk.permanent or LANG_STATE.permanent
+    end
+end
 
 -- key ภาษา (จัดลำดับใหม่: 1 EN, 2 TH, 3 VN, 4 ID, 5 PH, 6 BR)
 local ORDER = { "EN", "TH", "VN", "ID", "PH", "BR" }
@@ -217,12 +276,12 @@ local CONFIRM_I18N = {
     },
 }
 
--- ให้ค่าเริ่มต้น (ถ้าไม่มี)
-LANG_STATE.ui        = LANG_STATE.ui        or "EN"  -- ภาษาของ UI
-LANG_STATE.game      = LANG_STATE.game      or "EN"  -- ภาษาที่เลือกใช้ในเกม
-LANG_STATE.permanent = LANG_STATE.permanent or false -- ถาวรแล้วไม่ต้องขึ้น UI อีก
+-- ค่าเริ่มต้น (ถ้าไม่มี)
+LANG_STATE.ui        = LANG_STATE.ui        or "EN"
+LANG_STATE.game      = LANG_STATE.game      or "EN"
+LANG_STATE.permanent = LANG_STATE.permanent or false
 
--- ถ้าเคยเลือกถาวรแล้ว ไม่ต้องสร้าง UI อีก
+-- ถ้าเซฟไว้ว่า permanent และมีภาษาเกมแล้ว ให้ข้าม UI
 if LANG_STATE.permanent and LANG_STATE.game then
     return
 end
@@ -423,7 +482,7 @@ for _, key in ipairs(ORDER) do
     checkLabel.BackgroundTransparency = 1
     checkLabel.AnchorPoint = Vector2.new(0.5, 0.5)
     checkLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    checkLabel.Size = UDim2.new(0.45, 0, 0.55, 0) -- เล็กลง ไม่บังรูป
+    checkLabel.Size = UDim2.new(0.45, 0, 0.55, 0)
     checkLabel.Font = Enum.Font.GothamBold
     checkLabel.TextColor3 = THEME.WHITE
     checkLabel.Text = "✅"
@@ -435,7 +494,6 @@ for _, key in ipairs(ORDER) do
     nameLabel.Name = "Name"
     nameLabel.Parent = card
     nameLabel.AnchorPoint = Vector2.new(0.5, 0)
-    -- ให้ลอยใกล้ขอบล่างของธง ไม่ตกลงไปล่างมาก
     nameLabel.Position = UDim2.new(0.5, 0, 0.80, 0)
     nameLabel.Size = UDim2.new(1, 0, 0.2, 0)
     nameLabel.BackgroundTransparency = 1
@@ -516,9 +574,12 @@ end
 -- CONFIRM DIALOG (ถามยืนยัน + ตัวเลือกถาวร)
 ------------------------------------------------------------
 local function applyFinalLanguageSelection(makePermanent)
-    LANG_STATE.game = selectedGameLang
-    LANG_STATE.ui   = currentUILang
+    LANG_STATE.game      = selectedGameLang
+    LANG_STATE.ui        = currentUILang
     LANG_STATE.permanent = makePermanent and true or LANG_STATE.permanent
+
+    -- บันทึกลงไฟล์ทุกครั้งที่กดยืนยัน
+    saveLangToDisk(LANG_STATE)
 
     print("[UFO HUB X] Game Language =", selectedGameLang, "UI Language =", currentUILang, "Permanent =", LANG_STATE.permanent)
 
@@ -914,6 +975,7 @@ local function openSettings()
         btn.MouseButton1Click:Connect(function()
             currentUILang = langKey
             LANG_STATE.ui = currentUILang
+            saveLangToDisk(LANG_STATE)  -- เซฟเปลี่ยนภาษาของ UI ด้วย
             applyOverlayLanguageTexts()
             refreshOverlaySelection()
         end)
