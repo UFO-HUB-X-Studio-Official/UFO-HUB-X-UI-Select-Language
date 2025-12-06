@@ -1,4 +1,4 @@
---===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download + Confirm + Save) =====
+--===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download + Confirm + Save + Title) =====
 -- LocalScript (StarterPlayerScripts / StarterGui)
 
 local Players          = game:GetService("Players")
@@ -196,7 +196,7 @@ local UI_LANG_LABEL = {
         BR = "Português (Brasil)",
         VN = "Vietnamita",
         ID = "Indonésio",
-        PH = "Filipino",
+        PH = "Filipo",
         TITLE = "Idioma da Interface",
         CONFIRM = "Confirmar",
         SEARCH = "🔍 Buscar idioma",
@@ -414,6 +414,24 @@ end
 updateSettingsVisual(false)
 
 ------------------------------------------------------------
+-- TITLE "UFO HUB X" ตรงสี่เหลี่ยมสีขาวด้านบน
+------------------------------------------------------------
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Parent = main
+titleLabel.AnchorPoint = Vector2.new(0.5, 0)
+titleLabel.Position = UDim2.new(0.5, 0, 0.19, 0) -- ให้อยู่แถวเดียวกับสี่เหลี่ยมสีขาวในรูป
+titleLabel.Size = UDim2.new(0.55, 0, 0, 42)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextSize = 24
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+titleLabel.RichText = true
+titleLabel.Text = '<font color="#FFFFFF">UFO </font><font color="#19FF7D">HUB X</font>'
+titleLabel.ZIndex = 5
+
+------------------------------------------------------------
 -- GRID 6 ช่อง (ธง + ชื่อประเทศ)
 ------------------------------------------------------------
 local gridHolder = Instance.new("Frame")
@@ -475,7 +493,7 @@ for _, key in ipairs(ORDER) do
     flagImage.ZIndex = 3
     corner(flagImage, 10)
 
-    -- อิโมจิถูกตรงกลางรูป (ย่อเล็กลง)
+    -- อิโมจิถูกตรงกลางรูป
     local checkLabel = Instance.new("TextLabel")
     checkLabel.Name = "Check"
     checkLabel.Parent = flagFrame
