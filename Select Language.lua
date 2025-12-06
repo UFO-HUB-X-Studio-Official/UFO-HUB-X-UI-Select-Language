@@ -15,7 +15,7 @@ local LANG_STATE = _G.UFOX_LANG
 -- key ภาษา (จัดลำดับใหม่: 1 EN, 2 TH, 3 VN, 4 ID, 5 PH, 6 BR)
 local ORDER = { "EN", "TH", "VN", "ID", "PH", "BR" }
 
--- emoji ธงของแต่ละภาษา
+-- emoji ธงของแต่ละภาษา (ใช้กับข้อความชื่อภาษา)
 local FLAG = {
     EN = "🇺🇸",
     TH = "🇹🇭",
@@ -23,6 +23,16 @@ local FLAG = {
     VN = "🇻🇳",
     ID = "🇮🇩",
     PH = "🇵🇭",
+}
+
+-- รูปธงสำหรับช่องสีขาว (ImageId)
+local FLAG_IMAGE = {
+    EN = "rbxassetid://95220702385393",
+    TH = "rbxassetid://85475420394833",
+    VN = "rbxassetid://121044972368862",
+    ID = "rbxassetid://106130315481891",
+    PH = "rbxassetid://133122092149604",
+    BR = "rbxassetid://85295492411954",
 }
 
 -- URL ดาวน์โหลดตามภาษา
@@ -346,15 +356,15 @@ for _, key in ipairs(ORDER) do
     flagFrame.BorderSizePixel = 0
     corner(flagFrame, 8)
 
-    local flagLabel = Instance.new("TextLabel")
-    flagLabel.Name = "FlagEmoji"
-    flagLabel.Parent = flagFrame
-    flagLabel.BackgroundTransparency = 1
-    flagLabel.Size = UDim2.new(1, 0, 1, 0)
-    flagLabel.Font = Enum.Font.GothamBold
-    flagLabel.TextSize = 32
-    flagLabel.TextColor3 = THEME.BLACK
-    flagLabel.Text = FLAG[key] or ""
+    -- ใช้รูปธงในช่องสีขาว (ไม่มีอิโมจิ)
+    local flagImage = Instance.new("ImageLabel")
+    flagImage.Name = "FlagImage"
+    flagImage.Parent = flagFrame
+    flagImage.BackgroundTransparency = 1
+    flagImage.Size = UDim2.new(1, -6, 1, -6)
+    flagImage.Position = UDim2.new(0, 3, 0, 3)
+    flagImage.ScaleType = Enum.ScaleType.Fit
+    flagImage.Image = FLAG_IMAGE[key] or ""
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN)
 
@@ -505,8 +515,9 @@ local function openSettings()
     panel.Name = "Panel"
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
-    panel.Position = UDim2.new(1, -20, 0.5, 0)
-    panel.Size = UDim2.new(0, 260, 0.52, 0) -- ลดความสูงให้ดูพอดีแบบ A V2
+    -- เลื่อนลงมานิดหน่อยให้บาลานซ์กับ UI หลัก
+    panel.Position = UDim2.new(1, -20, 0.56, 0)
+    panel.Size = UDim2.new(0, 260, 0.52, 0)
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel  = 0
     corner(panel, 18)
@@ -567,10 +578,10 @@ local function openSettings()
 
     local pad = Instance.new("UIPadding")
     pad.Parent = list
-    pad.PaddingTop = UDim.new(0, 6)
-    pad.PaddingBottom = UDim.new(0, 6)
-    pad.PaddingLeft = UDim.new(0, 4)
-    pad.PaddingRight = UDim.new(0, 4)
+    pad.PaddingTop = UDim2.new(0, 6)
+    pad.PaddingBottom = UDim2.new(0, 6)
+    pad.PaddingLeft = UDim2.new(0, 4)
+    pad.PaddingRight = UDim2.new(0, 4)
 
     local locking = false
     list:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
@@ -639,6 +650,7 @@ local function openSettings()
         glow.BorderSizePixel = 0
         glow.Size = UDim2.new(0, 3, 1, 0)
         glow.Position = UDim2.new(0, 0, 0, 0)
+        glow.Visible = false
 
         langButtons[langKey] = {
             btn   = btn,
@@ -684,7 +696,7 @@ local function openSettings()
         sbStroke.Transparency = 0.3
     end)
 
-    -- ปิดเมื่อคลิกนอก panel
+    -- ปิด Settings เมื่อคลิกนอก panel
     settingsConn = UserInputService.InputBegan:Connect(function(input, gp)
         if gp then return end
         if input.UserInputType ~= Enum.UserInputType.MouseButton1
