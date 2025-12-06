@@ -392,13 +392,13 @@ for _, key in ipairs(ORDER) do
     hit.Text = ""
     hit.AutoButtonColor = false
 
-    -- กรอบรูปธง (ใหญ่ขึ้น)
+    -- กรอบรูปธงใหญ่ขึ้น
     local flagFrame = Instance.new("Frame")
     flagFrame.Name = "FlagFrame"
     flagFrame.Parent = card
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
-    flagFrame.Size = UDim2.new(0.88, 0, 0.82, 0)   -- สูงขึ้นกว่าของเดิม
+    flagFrame.Size = UDim2.new(0.88, 0, 0.75, 0)
     flagFrame.BackgroundColor3 = THEME.BLACK
     flagFrame.BackgroundTransparency = 1
     flagFrame.BorderSizePixel = 0
@@ -410,20 +410,20 @@ for _, key in ipairs(ORDER) do
     flagImage.BackgroundTransparency = 1
     flagImage.AnchorPoint = Vector2.new(0.5, 0.5)
     flagImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    flagImage.Size = UDim2.new(1, 0, 1, 0) -- ใช้เต็มกรอบ
+    flagImage.Size = UDim2.new(1, 0, 1, 0)
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
     flagImage.ZIndex = 3
     corner(flagImage, 10)
 
-    -- อิโมจิถูกตรงกลางรูป (แทนเอฟเฟกต์กรอบเขียว)
+    -- อิโมจิถูกตรงกลางรูป (ย่อเล็กลง)
     local checkLabel = Instance.new("TextLabel")
     checkLabel.Name = "Check"
     checkLabel.Parent = flagFrame
     checkLabel.BackgroundTransparency = 1
     checkLabel.AnchorPoint = Vector2.new(0.5, 0.5)
     checkLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    checkLabel.Size = UDim2.new(1, 0, 1, 0)
+    checkLabel.Size = UDim2.new(0.45, 0, 0.55, 0) -- เล็กลง ไม่บังรูป
     checkLabel.Font = Enum.Font.GothamBold
     checkLabel.TextColor3 = THEME.WHITE
     checkLabel.Text = "✅"
@@ -435,8 +435,9 @@ for _, key in ipairs(ORDER) do
     nameLabel.Name = "Name"
     nameLabel.Parent = card
     nameLabel.AnchorPoint = Vector2.new(0.5, 0)
-    nameLabel.Position = UDim2.new(0.5, 0, 1, 4)   -- เว้นห่างจากรูปเล็กน้อย
-    nameLabel.Size = UDim2.new(1, 0, 0.30, 0)
+    -- ให้ลอยใกล้ขอบล่างของธง ไม่ตกลงไปล่างมาก
+    nameLabel.Position = UDim2.new(0.5, 0, 0.80, 0)
+    nameLabel.Size = UDim2.new(1, 0, 0.2, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextSize = 14
@@ -585,7 +586,7 @@ local function openConfirmDialog()
     question.TextXAlignment = Enum.TextXAlignment.Center
     question.Text = questionText
 
-    -- แถว Permanent ใหม่ (ข้อความ + ปุ่มสี่เหลี่ยมแยก)
+    -- แถว Permanent (ข้อความ + ปุ่มสี่เหลี่ยมแยก)
     local permanent = false
 
     local permRow = Instance.new("Frame")
@@ -626,7 +627,7 @@ local function openConfirmDialog()
     permBox.Font = Enum.Font.GothamBold
     permBox.TextColor3 = THEME.WHITE
     permBox.Text = ""
-    permBox.TextScaled = true          -- emoji ✅ เต็มกรอบ
+    permBox.TextScaled = true
     corner(permBox, 6)
     stroke(permBox, 2.0, THEME.GREEN, 0)
 
@@ -674,7 +675,7 @@ local function openConfirmDialog()
     local cancel = Instance.new("TextButton")
     cancel.Name = "Cancel"
     cancel.Parent = panel
-    cancel.BackgroundColor3 = THEME.BLACK   -- พื้นดำตามที่ขอ
+    cancel.BackgroundColor3 = THEME.BLACK
     cancel.BorderSizePixel = 0
     cancel.Size = UDim2.new(0.48, -10, 0, 38)
     cancel.Position = UDim2.new(1, -8, 1, -48)
@@ -815,7 +816,7 @@ local function openSettings()
     local pad = Instance.new("UIPadding")
     pad.Parent = list
     pad.PaddingTop = UDim.new(0, 6)
-    pad.PaddingBottom = UDim2.new(0, 6)
+    pad.PaddingBottom = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 4)
     pad.PaddingRight = UDim.new(0, 4)
 
