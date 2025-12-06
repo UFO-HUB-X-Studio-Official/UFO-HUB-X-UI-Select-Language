@@ -1,4 +1,4 @@
---===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined) =====
+--===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags) =====
 -- LocalScript (StarterPlayerScripts / StarterGui)
 
 local Players          = game:GetService("Players")
@@ -14,6 +14,16 @@ local LANG_STATE = _G.UFOX_LANG
 
 -- key ภาษา
 local ORDER = { "EN", "TH", "BR", "VN", "ID", "PH" }
+
+-- emoji ธงของแต่ละภาษา
+local FLAG = {
+    EN = "🇺🇸",
+    TH = "🇹🇭",
+    BR = "🇧🇷",
+    VN = "🇻🇳",
+    ID = "🇮🇩",
+    PH = "🇵🇭",
+}
 
 -- ชื่อประเทศ/ภาษาแต่ละตัว (base)
 local BASE_NAMES = {
@@ -186,6 +196,14 @@ local function trim(s)
     return (s:gsub("^%s*(.-)%s*$","%1"))
 end
 
+local function withFlag(code, text)
+    local f = FLAG[code]
+    if f and f ~= "" then
+        return f .. " " .. text
+    end
+    return text
+end
+
 ------------------------------------------------------------
 -- ROOT GUI
 ------------------------------------------------------------
@@ -198,14 +216,14 @@ gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
 ------------------------------------------------------------
--- MAIN PANEL (ดำ + ขอบเขียว ปรับให้เนียนขึ้น)
+-- MAIN PANEL (ดำ + ขอบเขียว ปรับให้สูงขึ้น)
 ------------------------------------------------------------
 local main = Instance.new("Frame")
 main.Name = "Main"
 main.Parent = gui
 main.AnchorPoint = Vector2.new(0.5, 0.5)
 main.Position = UDim2.new(0.5, 0, 0.5, 0)
-main.Size = UDim2.new(0.62, 0, 0.52, 0)
+main.Size = UDim2.new(0.62, 0, 0.60, 0) -- เดิม 0.52 เพิ่มความสูงให้ด้านล่างยาวขึ้น
 main.BackgroundColor3 = THEME.DARK
 main.BorderSizePixel = 0
 corner(main, 18)
@@ -281,8 +299,8 @@ gridHolder.Name  = "GridHolder"
 gridHolder.Parent = main
 gridHolder.BackgroundTransparency = 1
 gridHolder.AnchorPoint = Vector2.new(0.5, 0.5)
-gridHolder.Position = UDim2.new(0.5, 0, 0.48, 0)
-gridHolder.Size = UDim2.new(0.9, 0, 0.55, 0)
+gridHolder.Position = UDim2.new(0.5, 0, 0.46, 0)
+gridHolder.Size = UDim2.new(0.9, 0, 0.58, 0)
 
 local gridLayout = Instance.new("UIGridLayout")
 gridLayout.Parent = gridHolder
@@ -334,7 +352,7 @@ for _, key in ipairs(ORDER) do
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN)
 
-    -- ชื่อประเทศด้านล่าง
+    -- ชื่อประเทศด้านล่าง (มีอิโมจิธง)
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
     nameLabel.Parent = card
@@ -364,8 +382,8 @@ local confirmBtn = Instance.new("TextButton")
 confirmBtn.Name = "Confirm"
 confirmBtn.Parent = main
 confirmBtn.AnchorPoint = Vector2.new(0.5, 1)
-confirmBtn.Position = UDim2.new(0.5, 0, 1, -18)
-confirmBtn.Size = UDim2.new(0, 170, 0, 40)
+confirmBtn.Position = UDim2.new(0.5, 0, 1, -22)
+confirmBtn.Size = UDim2.new(0, 180, 0, 42)
 confirmBtn.BackgroundColor3 = THEME.BLACK
 confirmBtn.BorderSizePixel  = 0
 confirmBtn.Font = Enum.Font.GothamBold
@@ -384,7 +402,7 @@ local function refreshCountryLabels()
         local data = cardMap[key]
         if data then
             local txt = (map and map[key]) or BASE_NAMES[key] or key
-            data.name.Text = txt
+            data.name.Text = withFlag(key, txt)
         end
     end
 
@@ -471,7 +489,7 @@ local function openSettings()
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
     panel.Position = UDim2.new(1, -20, 0.5, 0)
-    panel.Size = UDim2.new(0, 260, 0.55, 0)
+    panel.Size = UDim2.new(0, 260, 0.70, 0) -- ปรับให้สูงแบบ Model A V2 มากขึ้น
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel  = 0
     corner(panel, 18)
@@ -572,7 +590,8 @@ local function openSettings()
         title.Text = uiLangMap.TITLE or "UI Language"
         searchBox.PlaceholderText = uiLangMap.SEARCH or "🔍 Search"
         for code, info in pairs(langButtons) do
-            info.btn.Text = uiLangMap[code] or BASE_NAMES[code] or code
+            local base = uiLangMap[code] or BASE_NAMES[code] or code
+            info.btn.Text = withFlag(code, base)
         end
         refreshCountryLabels()
     end
@@ -590,7 +609,8 @@ local function openSettings()
         btn.TextColor3 = THEME.WHITE
         btn.TextXAlignment = Enum.TextXAlignment.Center
         btn.TextYAlignment = Enum.TextYAlignment.Center
-        btn.Text = uiLangMap[langKey] or BASE_NAMES[langKey] or langKey
+        local base = uiLangMap[langKey] or BASE_NAMES[langKey] or langKey
+        btn.Text = withFlag(langKey, base)
         corner(btn, 10)
 
         local st = stroke(btn, 1.6, THEME.GREEN_DARK, 0.4)
