@@ -177,9 +177,26 @@ local UI_LANG_LABEL = {
     },
 }
 
+-- ข้อความในหน้าต่างยืนยัน ตามภาษาของ UI
+local CONFIRM_I18N = {
+    EN = {
+        QUESTION = "Are you sure you want to use {LANG} as your default language?",
+        PERM     = "Tick this if you don't want the language selection screen to show again. This will make this language permanent.",
+        OK       = "✅ Confirm",
+        CANCEL   = "❌ Cancel",
+    },
+    TH = {
+        QUESTION = "คุณแน่ใจหรือไม่ว่าต้องการใช้ {LANG} เป็นภาษาหลักของคุณ?",
+        PERM     = "ติ๊กถูกช่องนี้ถ้าคุณไม่ต้องการให้หน้าต่างเลือกภาษาแสดงอีก ภาษานี้จะถูกตั้งเป็นถาวร.",
+        OK       = "✅ ยืนยัน",
+        CANCEL   = "❌ ยกเลิก",
+    },
+    -- ภาษาอื่นยังใช้ข้อความอังกฤษไปก่อน
+}
+
 -- ให้ค่าเริ่มต้น (ถ้าไม่มี)
-LANG_STATE.ui       = LANG_STATE.ui       or "EN"  -- ภาษาของ UI
-LANG_STATE.game     = LANG_STATE.game     or "EN"  -- ภาษาที่เลือกใช้ในเกม
+LANG_STATE.ui        = LANG_STATE.ui        or "EN"  -- ภาษาของ UI
+LANG_STATE.game      = LANG_STATE.game      or "EN"  -- ภาษาที่เลือกใช้ในเกม
 LANG_STATE.permanent = LANG_STATE.permanent or false -- ถาวรแล้วไม่ต้องขึ้น UI อีก
 
 -- ถ้าเคยเลือกถาวรแล้ว ไม่ต้องสร้าง UI อีก
@@ -357,9 +374,10 @@ for _, key in ipairs(ORDER) do
     flagFrame.Parent = card
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
-    flagFrame.Size = UDim2.new(1, 0, 0.7, 0)
+    -- ให้มี margin ซ้ายขวา ไม่ให้กรอบเขียวลากยาวสุดเกินไป
+    flagFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
     flagFrame.BackgroundColor3 = THEME.BLACK
-    flagFrame.BackgroundTransparency = 1 -- ไม่มีพื้นหลังขาว
+    flagFrame.BackgroundTransparency = 1
     flagFrame.BorderSizePixel = 0
     corner(flagFrame, 10)
 
@@ -367,11 +385,17 @@ for _, key in ipairs(ORDER) do
     flagImage.Name = "FlagImage"
     flagImage.Parent = flagFrame
     flagImage.BackgroundTransparency = 1
+    flagImage.AnchorPoint = Vector2.new(0.5, 0.5)
+    flagImage.Position = UDim2.new(0.5, 0, 0.5, 0)
     flagImage.Size = UDim2.new(1, 0, 1, 0)
-    flagImage.Position = UDim2.new(0, 0, 0, 0)
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
     corner(flagImage, 10)
+
+    -- ขยายธงไทย / เวียดนาม / อินโด ให้ใหญ่ขึ้นอีกนิด
+    if key == "TH" or key == "VN" or key == "ID" then
+        flagImage.Size = UDim2.new(1.08, 0, 1.08, 0)
+    end
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN, 1) -- ใช้เป็นเอฟเฟกต์เลือก
 
@@ -499,14 +523,25 @@ local function openConfirmDialog()
     panel.Parent = overlay
     panel.AnchorPoint = Vector2.new(0.5, 0.5)
     panel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    panel.Size = UDim2.new(0, 440, 0, 210)
+    panel.Size = UDim2.new(0, 460, 0, 220)
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel = 0
     panel.ZIndex = 101
     corner(panel, 16)
     stroke(panel, 2.6, THEME.GREEN, 0)
 
-    -- ข้อความคำถาม (พื้นที่เดิมสีเหลือง)
+    local uiLang = currentUILang
+    local confirmMap = CONFIRM_I18N[uiLang] or CONFIRM_I18N["EN"]
+
+    -- ชื่อภาษาในภาษาของ UI
+    local langNameUi = (NAME_I18N[uiLang] and NAME_I18N[uiLang][selectedGameLang])
+        or BASE_NAMES[selectedGameLang]
+        or selectedGameLang
+
+    local questionText = (confirmMap.QUESTION or "Are you sure you want to use {LANG} as your default language?")
+    questionText = string.gsub(questionText, "{LANG}", tostring(langNameUi))
+
+    -- ข้อความคำถาม
     local question = Instance.new("TextLabel")
     question.Parent = panel
     question.BackgroundColor3 = THEME.BLACK
@@ -522,72 +557,108 @@ local function openConfirmDialog()
     question.TextWrapped = true
     question.TextYAlignment = Enum.TextYAlignment.Center
     question.TextXAlignment = Enum.TextXAlignment.Center
+    question.Text = questionText
 
-    local langName = (NAME_I18N["EN"] and NAME_I18N["EN"][selectedGameLang]) or BASE_NAMES[selectedGameLang] or selectedGameLang
-    question.Text = "Are you sure you want to use ".. tostring(langName) .." as your default language?"
-
-    -- ปุ่ม Permanent (ช่องสีส้มเดิม)
+    -- แถว Permanent ใหม่ (ข้อความ + ปุ่มสี่เหลี่ยมแยก)
     local permanent = false
 
-    local permBtn = Instance.new("TextButton")
-    permBtn.Name = "Permanent"
-    permBtn.Parent = panel
-    permBtn.BackgroundColor3 = THEME.BLACK
-    permBtn.BorderSizePixel = 0
-    permBtn.Size = UDim2.new(1, -16, 0, 40)
-    permBtn.Position = UDim2.new(0, 8, 0, 100)
-    permBtn.ZIndex = 102
-    permBtn.AutoButtonColor = false
-    corner(permBtn, 10)
-    stroke(permBtn, 1.8, THEME.GREEN, 0.1)
-    permBtn.Font = Enum.Font.Gotham
-    permBtn.TextSize = 14
-    permBtn.TextColor3 = THEME.WHITE
-    permBtn.TextWrapped = true
-    permBtn.TextXAlignment = Enum.TextXAlignment.Left
+    local permRow = Instance.new("Frame")
+    permRow.Name = "PermanentRow"
+    permRow.Parent = panel
+    permRow.BackgroundColor3 = THEME.BLACK
+    permRow.BorderSizePixel = 0
+    permRow.Size = UDim2.new(1, -16, 0, 44)
+    permRow.Position = UDim2.new(0, 8, 0, 100)
+    permRow.ZIndex = 102
+    corner(permRow, 10)
+    stroke(permRow, 1.8, THEME.GREEN, 0.1)
 
-    local function updatePermText()
-        local icon = permanent and "✅" or "☐"
-        permBtn.Text = icon .. "  Tick this if you don't want the language selection screen to show again. This will make this language permanent."
+    local permLabel = Instance.new("TextLabel")
+    permLabel.Parent = permRow
+    permLabel.BackgroundTransparency = 1
+    permLabel.Size = UDim2.new(1, -60, 1, 0)
+    permLabel.Position = UDim2.new(0, 10, 0, 0)
+    permLabel.ZIndex = 103
+    permLabel.Font = Enum.Font.Gotham
+    permLabel.TextSize = 14
+    permLabel.TextColor3 = THEME.WHITE
+    permLabel.TextWrapped = true
+    permLabel.TextXAlignment = Enum.TextXAlignment.Left
+    permLabel.TextYAlignment = Enum.TextYAlignment.Center
+    permLabel.Text = confirmMap.PERM or CONFIRM_I18N.EN.PERM
+
+    local permBox = Instance.new("TextButton")
+    permBox.Name = "PermBox"
+    permBox.Parent = permRow
+    permBox.AnchorPoint = Vector2.new(1, 0.5)
+    permBox.Position = UDim2.new(1, -10, 0.5, 0)
+    permBox.Size = UDim2.new(0, 30, 0, 30)
+    permBox.BackgroundColor3 = THEME.BLACK
+    permBox.BorderSizePixel = 0
+    permBox.AutoButtonColor = false
+    permBox.ZIndex = 104
+    permBox.Font = Enum.Font.GothamBold
+    permBox.TextSize = 20
+    permBox.TextColor3 = THEME.WHITE
+    permBox.Text = ""
+    corner(permBox, 6)
+    stroke(permBox, 2.0, THEME.GREEN, 0)
+
+    local function updatePermVisual()
+        if permanent then
+            permBox.Text = "✅"
+        else
+            permBox.Text = ""
+        end
     end
-    updatePermText()
+    updatePermVisual()
 
-    permBtn.MouseButton1Click:Connect(function()
+    permBox.MouseButton1Click:Connect(function()
         permanent = not permanent
-        updatePermText()
+        updatePermVisual()
     end)
 
-    -- ปุ่ม Confirm / Cancel (ฟ้า / แดงเดิม)
+    -- คลิกทั้งแถวก็ได้
+    permRow.InputBegan:Connect(function(input, gp)
+        if gp then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            permanent = not permanent
+            updatePermVisual()
+        end
+    end)
+
+    -- ปุ่ม Confirm / Cancel
     local confirm = Instance.new("TextButton")
     confirm.Name = "Confirm"
     confirm.Parent = panel
     confirm.BackgroundColor3 = THEME.BLACK
     confirm.BorderSizePixel = 0
-    confirm.Size = UDim2.new(0.48, -10, 0, 36)
-    confirm.Position = UDim2.new(0, 8, 1, -46)
+    confirm.Size = UDim2.new(0.48, -10, 0, 38)
+    confirm.Position = UDim2.new(0, 8, 1, -48)
     confirm.ZIndex = 102
     confirm.AutoButtonColor = false
     confirm.Font = Enum.Font.GothamBold
     confirm.TextSize = 14
     confirm.TextColor3 = THEME.WHITE
-    confirm.Text = "Confirm"
+    confirm.Text = confirmMap.OK or CONFIRM_I18N.EN.OK
     corner(confirm, 10)
     stroke(confirm, 2.0, THEME.GREEN, 0)
 
     local cancel = Instance.new("TextButton")
     cancel.Name = "Cancel"
     cancel.Parent = panel
-    cancel.BackgroundColor3 = THEME.BLACK
+    cancel.BackgroundColor3 = THEME.RED   -- ปุ่มยกเลิกเป็นสีแดง
     cancel.BorderSizePixel = 0
-    cancel.Size = UDim2.new(0.48, -10, 0, 36)
-    cancel.Position = UDim2.new(1, -8, 1, -46)
+    cancel.Size = UDim2.new(0.48, -10, 0, 38)
+    cancel.Position = UDim2.new(1, -8, 1, -48)
     cancel.AnchorPoint = Vector2.new(1, 0)
     cancel.ZIndex = 102
     cancel.AutoButtonColor = false
     cancel.Font = Enum.Font.GothamBold
     cancel.TextSize = 14
     cancel.TextColor3 = THEME.WHITE
-    cancel.Text = "Cancel"
+    cancel.Text = confirmMap.CANCEL or CONFIRM_I18N.EN.CANCEL
     corner(cancel, 10)
     stroke(cancel, 2.0, THEME.GREEN, 0)
 
