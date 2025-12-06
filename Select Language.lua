@@ -25,14 +25,14 @@ local FLAG = {
     PH = "🇵🇭",
 }
 
--- รูปธง (ใช้ในช่องด้านบน)
+-- รูปธง (ใช้ในช่องด้านบน) — ใช้ ID ชุดใหม่
 local FLAG_IMAGE = {
-    EN = "rbxassetid://95220702385393",
-    TH = "rbxassetid://85475420394833",
-    VN = "rbxassetid://121044972368862",
-    ID = "rbxassetid://106130315481891",
-    PH = "rbxassetid://133122092149604",
-    BR = "rbxassetid://85295492411954",
+    EN = "rbxassetid://128263302054545",
+    TH = "rbxassetid://100174058259096",
+    VN = "rbxassetid://74639098383510",
+    ID = "rbxassetid://121254833044946",
+    PH = "rbxassetid://75593497550891",
+    BR = "rbxassetid://91291855862995",
 }
 
 -- URL ดาวน์โหลดตามภาษา
@@ -191,7 +191,30 @@ local CONFIRM_I18N = {
         OK       = "✅ ยืนยัน",
         CANCEL   = "❌ ยกเลิก",
     },
-    -- ภาษาอื่นยังใช้ข้อความอังกฤษไปก่อน
+    BR = {
+        QUESTION = "Você tem certeza que deseja usar {LANG} como seu idioma padrão?",
+        PERM     = "Marque isto se não quiser que a tela de seleção de idioma apareça novamente. Isso tornará esse idioma permanente.",
+        OK       = "✅ Confirmar",
+        CANCEL   = "❌ Cancelar",
+    },
+    VN = {
+        QUESTION = "Bạn có chắc muốn dùng {LANG} làm ngôn ngữ mặc định không?",
+        PERM     = "Đánh dấu vào đây nếu bạn không muốn màn hình chọn ngôn ngữ hiện lại. Ngôn ngữ này sẽ được đặt vĩnh viễn.",
+        OK       = "✅ Xác nhận",
+        CANCEL   = "❌ Hủy",
+    },
+    ID = {
+        QUESTION = "Apakah kamu yakin ingin memakai {LANG} sebagai bahasa utama?",
+        PERM     = "Centang ini jika kamu tidak ingin layar pemilihan bahasa muncul lagi. Bahasa ini akan dibuat permanen.",
+        OK       = "✅ Konfirmasi",
+        CANCEL   = "❌ Batal",
+    },
+    PH = {
+        QUESTION = "Sigurado ka bang gagamitin ang {LANG} bilang default na wika?",
+        PERM     = "Lagyan ng marka ito kung ayaw mo nang lumabas muli ang screen ng pagpili ng wika. Gagawin nitong permanente ang wikang ito.",
+        OK       = "✅ Kumpirma",
+        CANCEL   = "❌ Kanselahin",
+    },
 }
 
 -- ให้ค่าเริ่มต้น (ถ้าไม่มี)
@@ -387,15 +410,10 @@ for _, key in ipairs(ORDER) do
     flagImage.BackgroundTransparency = 1
     flagImage.AnchorPoint = Vector2.new(0.5, 0.5)
     flagImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    flagImage.Size = UDim2.new(1, 0, 1, 0)
+    flagImage.Size = UDim2.new(1, 0, 1, 0) -- ใช้เต็มกรอบเท่ากันทุกประเทศ
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
     corner(flagImage, 10)
-
-    -- ขยายธงไทย / เวียดนาม / อินโด ให้ใหญ่ขึ้นอีกนิด
-    if key == "TH" or key == "VN" or key == "ID" then
-        flagImage.Size = UDim2.new(1.08, 0, 1.08, 0)
-    end
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN, 1) -- ใช้เป็นเอฟเฟกต์เลือก
 
@@ -659,6 +677,8 @@ local function openConfirmDialog()
     cancel.TextSize = 14
     cancel.TextColor3 = THEME.WHITE
     cancel.Text = confirmMap.CANCEL or CONFIRM_I18N.EN.CANCEL
+    cancel.TextStrokeColor3 = THEME.BLACK     -- ขอบตัวหนังสือสีดำให้มองชัด
+    cancel.TextStrokeTransparency = 0
     corner(cancel, 10)
     stroke(cancel, 2.0, THEME.GREEN, 0)
 
