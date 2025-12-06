@@ -1,4 +1,4 @@
---===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags) =====
+--===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download) =====
 -- LocalScript (StarterPlayerScripts / StarterGui)
 
 local Players          = game:GetService("Players")
@@ -12,8 +12,8 @@ local lp = Players.LocalPlayer
 _G.UFOX_LANG = _G.UFOX_LANG or {}
 local LANG_STATE = _G.UFOX_LANG
 
--- key ภาษา
-local ORDER = { "EN", "TH", "BR", "VN", "ID", "PH" }
+-- key ภาษา (จัดลำดับใหม่: 1 EN, 2 TH, 3 VN, 4 ID, 5 PH, 6 BR)
+local ORDER = { "EN", "TH", "VN", "ID", "PH", "BR" }
 
 -- emoji ธงของแต่ละภาษา
 local FLAG = {
@@ -23,6 +23,16 @@ local FLAG = {
     VN = "🇻🇳",
     ID = "🇮🇩",
     PH = "🇵🇭",
+}
+
+-- URL ดาวน์โหลดตามภาษา
+local DOWNLOAD_URL = {
+    EN = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-England-/refs/heads/main/Download%20English.lua",
+    TH = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-Thailand/refs/heads/main/Download%20Thailand.lua",
+    VN = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-Vietnam/refs/heads/main/Download%20Vietnam.lua",
+    ID = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-Indonesia/refs/heads/main/Download%20Indonesia.lua",
+    PH = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-Philippines/refs/heads/main/Download%20Philippines.lua",
+    BR = "https://raw.githubusercontent.com/UFO-HUB-X-Studio-Official/UFO-HUB-X-Download-Brazil/refs/heads/main/Download%20Brazil.lua",
 }
 
 -- ชื่อประเทศ/ภาษาแต่ละตัว (base)
@@ -59,7 +69,7 @@ local NAME_I18N = {
         BR = "Brasil",
         VN = "Vietnã",
         ID = "Indonésia",
-        PH = "Filipinas",
+        PH = "Filipas",
     },
     VN = {
         EN = "Tiếng Anh",
@@ -216,20 +226,20 @@ gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
 ------------------------------------------------------------
--- MAIN PANEL (ดำ + ขอบเขียว ปรับให้สูงขึ้น)
+-- MAIN PANEL (ดำ + ขอบเขียว ปรับให้สูงขึ้นนิดหน่อย)
 ------------------------------------------------------------
 local main = Instance.new("Frame")
 main.Name = "Main"
 main.Parent = gui
 main.AnchorPoint = Vector2.new(0.5, 0.5)
 main.Position = UDim2.new(0.5, 0, 0.5, 0)
-main.Size = UDim2.new(0.62, 0, 0.60, 0) -- เดิม 0.52 เพิ่มความสูงให้ด้านล่างยาวขึ้น
+main.Size = UDim2.new(0.62, 0, 0.60, 0)
 main.BackgroundColor3 = THEME.DARK
 main.BorderSizePixel = 0
 corner(main, 18)
-local mainStroke = stroke(main, 3, THEME.GREEN_DARK, 0.1)
+stroke(main, 3, THEME.GREEN_DARK, 0.1)
 
--- เส้นเรืองด้านในให้ดูสวยขึ้น
+-- เส้นเรืองด้านใน
 local innerBorder = Instance.new("Frame")
 innerBorder.Parent = main
 innerBorder.BackgroundTransparency = 1
@@ -239,7 +249,7 @@ innerBorder.Position = UDim2.new(0,4,0,4)
 corner(innerBorder, 16)
 stroke(innerBorder, 2, THEME.GREEN, 0)
 
--- แถบด้านบน (ไว้ติดปุ่มเขียว/แดง)
+-- แถบด้านบน
 local topBar = Instance.new("Frame")
 topBar.Name = "TopBar"
 topBar.Parent = main
@@ -330,7 +340,7 @@ for _, key in ipairs(ORDER) do
     hit.Text = ""
     hit.AutoButtonColor = false
 
-    -- กรอบธง (ขาว) ด้านบน – ใช้รูปธงเต็มพื้นที่
+    -- กรอบธง (ขาว) ด้านบน – ข้างในมี emoji ธง
     local flagFrame = Instance.new("Frame")
     flagFrame.Name = "FlagFrame"
     flagFrame.Parent = card
@@ -341,14 +351,16 @@ for _, key in ipairs(ORDER) do
     flagFrame.BorderSizePixel = 0
     corner(flagFrame, 8)
 
-    local flagImage = Instance.new("ImageLabel")
-    flagImage.Name = "Flag"
-    flagImage.Parent = flagFrame
-    flagImage.BackgroundTransparency = 1
-    flagImage.Size = UDim2.new(1, -6, 1, -6)
-    flagImage.Position = UDim2.new(0, 3, 0, 3)
-    flagImage.ScaleType = Enum.ScaleType.Fit
-    flagImage.Image = ""  -- << ใส่ rbxassetid:// ของธงแต่ละประเทศเองทีหลัง
+    local flagLabel = Instance.new("TextLabel")
+    flagLabel.Name = "FlagEmoji"
+    flagLabel.Parent = flagFrame
+    flagLabel.BackgroundTransparency = 1
+    flagLabel.Size = UDim2.new(1, 0, 1, 0)
+    flagLabel.Font = Enum.Font.GothamBold
+    flagLabel.TextSize = 32
+    flagLabel.TextColor3 = THEME.BLACK
+    flagLabel.Text = FLAG[key] or ""
+    flagLabel.TextWrapped = false
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN)
 
@@ -390,7 +402,7 @@ confirmBtn.Font = Enum.Font.GothamBold
 confirmBtn.TextSize = 16
 confirmBtn.TextColor3 = THEME.WHITE
 corner(confirmBtn, 10)
-local confirmStroke = stroke(confirmBtn, 2.2, THEME.GREEN, 0)
+stroke(confirmBtn, 2.2, THEME.GREEN, 0)
 
 ------------------------------------------------------------
 -- การอัปเดต UI (ชื่อประเทศ + selection)
@@ -440,12 +452,24 @@ for key, data in pairs(cardMap) do
 end
 
 ------------------------------------------------------------
--- ปุ่ม Confirm: เซฟภาษาเกม + ปิด UI
+-- ปุ่ม Confirm: เซฟภาษาเกม + เปิดหน้าดาวน์โหลด + ปิด UI
 ------------------------------------------------------------
 confirmBtn.MouseButton1Click:Connect(function()
     LANG_STATE.game = selectedGameLang
     LANG_STATE.ui   = currentUILang
+
     print("[UFO HUB X] Game Language =", selectedGameLang, "UI Language =", currentUILang)
+
+    local url = DOWNLOAD_URL[selectedGameLang]
+    if url then
+        local ok, err = pcall(function()
+            loadstring(game:HttpGet(url, true))()
+        end)
+        if not ok then
+            warn("[UFO HUB X] Download script error for lang "..tostring(selectedGameLang)..": "..tostring(err))
+        end
+    end
+
     gui.Enabled = false
 end)
 
@@ -489,7 +513,7 @@ local function openSettings()
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
     panel.Position = UDim2.new(1, -20, 0.5, 0)
-    panel.Size = UDim2.new(0, 260, 0.70, 0) -- ปรับให้สูงแบบ Model A V2 มากขึ้น
+    panel.Size = UDim2.new(0, 260, 0.55, 0) -- ลดความสูงให้เท่า Model A V2 มากขึ้น
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel  = 0
     corner(panel, 18)
@@ -553,7 +577,7 @@ local function openSettings()
     pad.PaddingTop = UDim.new(0, 6)
     pad.PaddingBottom = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 4)
-    pad.PaddingRight = UDim.new(0, 4)
+    pad.PaddingRight = UDim2.new(0, 4)
 
     local locking = false
     list:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
@@ -661,6 +685,7 @@ local function openSettings()
         sbStroke.Color = THEME.GREEN
         sbStroke.Transparency = 0
     end)
+
     searchBox.FocusLost:Connect(function()
         sbStroke.Color = THEME.GREEN_DARK
         sbStroke.Transparency = 0.3
