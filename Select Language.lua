@@ -414,17 +414,25 @@ end
 updateSettingsVisual(false)
 
 ------------------------------------------------------------
--- TITLE "UFO HUB X" ตรงสี่เหลี่ยมสีขาวด้านบน
+-- TITLE "UFO HUB X" ตรงสี่เหลี่ยมสีขาวด้านบน (ขยับขึ้น + ตัวใหญ่ขึ้น)
 ------------------------------------------------------------
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "Title"
 titleLabel.Parent = main
 titleLabel.AnchorPoint = Vector2.new(0.5, 0)
-titleLabel.Position = UDim2.new(0.5, 0, 0.19, 0) -- ให้อยู่แถวเดียวกับสี่เหลี่ยมสีขาวในรูป
-titleLabel.Size = UDim2.new(0.55, 0, 0, 42)
+
+-- ขยับขึ้นไปด้านบนอีกหน่อยให้อยู่กลางสี่เหลี่ยมสีขาว
+titleLabel.Position = UDim2.new(0.5, 0, 0.12, 0)
+
+-- ทำให้แถบตัวหนังสือสูงขึ้นหน่อย
+titleLabel.Size = UDim2.new(0.6, 0, 0, 56)
+
 titleLabel.BackgroundTransparency = 1
 titleLabel.Font = Enum.Font.GothamBlack
-titleLabel.TextSize = 24
+
+-- ขยายขนาดฟอนต์ให้เด่นขึ้น
+titleLabel.TextSize = 30
+
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.RichText = true
