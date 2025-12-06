@@ -422,7 +422,7 @@ titleLabel.Parent = main
 titleLabel.AnchorPoint = Vector2.new(0.5, 0)
 
 -- ⭐ ดันขึ้นด้วย offset -30 (ขึ้นไปด้านบน)
-titleLabel.Position = UDim2.new(0.5, 0, 0.00, -30)
+titleLabel.Position = UDim2.new(0.5, 0, 0.00, -20)
 
 -- ⭐ ปรับขนาดรองรับฟอนต์ใหญ่
 titleLabel.Size = UDim2.new(0.7, 0, 0, 105)
