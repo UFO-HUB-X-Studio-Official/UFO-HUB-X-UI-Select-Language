@@ -414,30 +414,33 @@ end
 updateSettingsVisual(false)
 
 ------------------------------------------------------------
--- TITLE "UFO HUB X" ตรงสี่เหลี่ยมสีขาวด้านบน (ขยับขึ้น + ตัวใหญ่ขึ้น)
+-- TITLE "UFO HUB X" (เวอร์ชันใหญ่ เด่น สูงขึ้นเยอะ)
 ------------------------------------------------------------
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "Title"
 titleLabel.Parent = main
 titleLabel.AnchorPoint = Vector2.new(0.5, 0)
 
--- ขยับขึ้นไปด้านบนอีกหน่อยให้อยู่กลางสี่เหลี่ยมสีขาว
-titleLabel.Position = UDim2.new(0.5, 0, 0.12, 0)
+-- ⭐ ขยับขึ้นสูงแบบชัดเจน (ยิ่งเลขน้อย ยิ่งสูง)
+titleLabel.Position = UDim2.new(0.5, 0, 0.02, 0)
 
--- ทำให้แถบตัวหนังสือสูงขึ้นหน่อย
-titleLabel.Size = UDim2.new(0.6, 0, 0, 56)
+-- ⭐ เพิ่มขนาดกรอบให้รองรับฟอนต์ใหญ่
+titleLabel.Size = UDim2.new(0.6, 0, 0, 90)
 
 titleLabel.BackgroundTransparency = 1
 titleLabel.Font = Enum.Font.GothamBlack
 
--- ขยายขนาดฟอนต์ให้เด่นขึ้น
-titleLabel.TextSize = 30
+-- ⭐ ฟอนต์ใหญ่แบบหัวข้อหลัก (โลโก้)
+titleLabel.TextSize = 48
 
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.RichText = true
+
+-- ⭐ UFO = ขาว / HUB X = เขียวไฮไลต์
 titleLabel.Text = '<font color="#FFFFFF">UFO </font><font color="#19FF7D">HUB X</font>'
-titleLabel.ZIndex = 5
+
+titleLabel.ZIndex = 10
 
 ------------------------------------------------------------
 -- GRID 6 ช่อง (ธง + ชื่อประเทศ)
