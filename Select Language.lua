@@ -25,7 +25,7 @@ local FLAG = {
     PH = "🇵🇭",
 }
 
--- รูปธง (ใช้ในช่องด้านบน) — ใช้ ID ชุดใหม่
+-- รูปธง (ใช้ในช่องด้านบน)
 local FLAG_IMAGE = {
     EN = "rbxassetid://128263302054545",
     TH = "rbxassetid://100174058259096",
@@ -392,51 +392,51 @@ for _, key in ipairs(ORDER) do
     hit.Text = ""
     hit.AutoButtonColor = false
 
-    -- กรอบใหญ่เท่าเดิม (ให้รูปใหญ่เหมือนเวอร์ชันที่ชอบ)
+    -- กรอบรูปธง (ใหญ่ขึ้น)
     local flagFrame = Instance.new("Frame")
     flagFrame.Name = "FlagFrame"
     flagFrame.Parent = card
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
-    flagFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
+    flagFrame.Size = UDim2.new(0.88, 0, 0.82, 0)   -- สูงขึ้นกว่าของเดิม
     flagFrame.BackgroundColor3 = THEME.BLACK
     flagFrame.BackgroundTransparency = 1
     flagFrame.BorderSizePixel = 0
     corner(flagFrame, 10)
 
-    -- กรอบด้านในสำหรับเส้นเขียว (สั้นลงนิดนึงให้ฟิตกับรูป)
-    local strokeFrame = Instance.new("Frame")
-    strokeFrame.Name = "StrokeFrame"
-    strokeFrame.Parent = flagFrame
-    strokeFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    strokeFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    -- ลดซ้ายขวานิดหน่อยให้ไม่ยาวจนติดขอบ card
-    strokeFrame.Size = UDim2.new(0.93, 0, 0.93, 0)
-    strokeFrame.BackgroundTransparency = 1
-    strokeFrame.BorderSizePixel = 0
-    corner(strokeFrame, 10)
-
     local flagImage = Instance.new("ImageLabel")
     flagImage.Name = "FlagImage"
-    flagImage.Parent = strokeFrame
+    flagImage.Parent = flagFrame
     flagImage.BackgroundTransparency = 1
     flagImage.AnchorPoint = Vector2.new(0.5, 0.5)
     flagImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    -- หดเข้าไป 2 px รอบด้าน ให้มีช่องว่างเล็ก ๆ ก่อนถึงเส้นเขียว
-    flagImage.Size = UDim2.new(1, -4, 1, -4)
+    flagImage.Size = UDim2.new(1, 0, 1, 0) -- ใช้เต็มกรอบ
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
+    flagImage.ZIndex = 3
     corner(flagImage, 10)
 
-    local flagStroke = stroke(strokeFrame, 0, THEME.GREEN, 1) -- เอฟเฟกต์เลือก
+    -- อิโมจิถูกตรงกลางรูป (แทนเอฟเฟกต์กรอบเขียว)
+    local checkLabel = Instance.new("TextLabel")
+    checkLabel.Name = "Check"
+    checkLabel.Parent = flagFrame
+    checkLabel.BackgroundTransparency = 1
+    checkLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    checkLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    checkLabel.Size = UDim2.new(1, 0, 1, 0)
+    checkLabel.Font = Enum.Font.GothamBold
+    checkLabel.TextColor3 = THEME.WHITE
+    checkLabel.Text = "✅"
+    checkLabel.TextScaled = true
+    checkLabel.Visible = false
+    checkLabel.ZIndex = 4
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
     nameLabel.Parent = card
-    nameLabel.AnchorPoint = Vector2.new(0.5, 1)
-    -- ใช้แบบเดิม แต่ดันให้สูงขึ้นนิดหน่อยจากขอบล่างของ card
-    nameLabel.Position = UDim2.new(0.5, 0, 1, -2)
-    nameLabel.Size = UDim2.new(1, 0, 0.32, -2)
+    nameLabel.AnchorPoint = Vector2.new(0.5, 0)
+    nameLabel.Position = UDim2.new(0.5, 0, 1, 4)   -- เว้นห่างจากรูปเล็กน้อย
+    nameLabel.Size = UDim2.new(1, 0, 0.30, 0)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextSize = 14
@@ -448,7 +448,8 @@ for _, key in ipairs(ORDER) do
         card   = card,
         hit    = hit,
         flag   = flagFrame,
-        stroke = flagStroke,
+        image  = flagImage,
+        check  = checkLabel,
         name   = nameLabel,
     }
 end
@@ -492,14 +493,7 @@ local function refreshSelection()
     for _, key in ipairs(ORDER) do
         local data = cardMap[key]
         if data then
-            if key == selectedGameLang then
-                data.stroke.Thickness = 3
-                data.stroke.Color = THEME.GREEN
-                data.stroke.Transparency = 0
-            else
-                data.stroke.Thickness = 0
-                data.stroke.Transparency = 1
-            end
+            data.check.Visible = (key == selectedGameLang)
         end
     end
 end
@@ -630,10 +624,9 @@ local function openConfirmDialog()
     permBox.AutoButtonColor = false
     permBox.ZIndex = 104
     permBox.Font = Enum.Font.GothamBold
-    permBox.TextSize = 24
-    permBox.TextScaled = true          -- ให้ emoji ✅ ขยายเต็มกรอบมากขึ้น
     permBox.TextColor3 = THEME.WHITE
     permBox.Text = ""
+    permBox.TextScaled = true          -- emoji ✅ เต็มกรอบ
     corner(permBox, 6)
     stroke(permBox, 2.0, THEME.GREEN, 0)
 
@@ -681,7 +674,7 @@ local function openConfirmDialog()
     local cancel = Instance.new("TextButton")
     cancel.Name = "Cancel"
     cancel.Parent = panel
-    cancel.BackgroundColor3 = THEME.BLACK   -- กลับมาเป็นพื้นสีดำเหมือนเดิม
+    cancel.BackgroundColor3 = THEME.BLACK   -- พื้นดำตามที่ขอ
     cancel.BorderSizePixel = 0
     cancel.Size = UDim2.new(0.48, -10, 0, 38)
     cancel.Position = UDim2.new(1, -8, 1, -48)
@@ -692,7 +685,7 @@ local function openConfirmDialog()
     cancel.TextSize = 14
     cancel.TextColor3 = THEME.WHITE
     cancel.Text = confirmMap.CANCEL or CONFIRM_I18N.EN.CANCEL
-    cancel.TextStrokeColor3 = THEME.BLACK     -- ขอบตัวหนังสือสีดำให้มองชัด
+    cancel.TextStrokeColor3 = THEME.BLACK
     cancel.TextStrokeTransparency = 0
     corner(cancel, 10)
     stroke(cancel, 2.0, THEME.GREEN, 0)
@@ -754,7 +747,6 @@ local function openSettings()
     panel.Name = "Panel"
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
-    -- ขยับตำแหน่ง / ขนาด ให้ดูซูมขึ้นและไม่กว้างเกินไป
     panel.Position = UDim2.new(1, -24, 0.52, 0)
     panel.Size = UDim2.new(0, 230, 0.5, 0)
     panel.BackgroundColor3 = THEME.BLACK
@@ -823,7 +815,7 @@ local function openSettings()
     local pad = Instance.new("UIPadding")
     pad.Parent = list
     pad.PaddingTop = UDim.new(0, 6)
-    pad.PaddingBottom = UDim.new(0, 6)
+    pad.PaddingBottom = UDim2.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 4)
     pad.PaddingRight = UDim.new(0, 4)
 
