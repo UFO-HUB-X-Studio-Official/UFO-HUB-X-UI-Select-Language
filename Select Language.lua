@@ -1,4 +1,4 @@
---===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download) =====
+--===== UFO HUB X • Language Select Panel (Grid + A V2 Settings – Refined + Flags + Download + Confirm) =====
 -- LocalScript (StarterPlayerScripts / StarterGui)
 
 local Players          = game:GetService("Players")
@@ -25,7 +25,7 @@ local FLAG = {
     PH = "🇵🇭",
 }
 
--- รูปธงสำหรับช่องสีขาว (ImageId)
+-- รูปธง (ใช้ในช่องด้านบน)
 local FLAG_IMAGE = {
     EN = "rbxassetid://95220702385393",
     TH = "rbxassetid://85475420394833",
@@ -178,8 +178,14 @@ local UI_LANG_LABEL = {
 }
 
 -- ให้ค่าเริ่มต้น (ถ้าไม่มี)
-LANG_STATE.ui   = LANG_STATE.ui   or "EN"  -- ภาษาของ UI
-LANG_STATE.game = LANG_STATE.game or "EN"  -- ภาษาที่เลือกใช้ในเกม
+LANG_STATE.ui       = LANG_STATE.ui       or "EN"  -- ภาษาของ UI
+LANG_STATE.game     = LANG_STATE.game     or "EN"  -- ภาษาที่เลือกใช้ในเกม
+LANG_STATE.permanent = LANG_STATE.permanent or false -- ถาวรแล้วไม่ต้องขึ้น UI อีก
+
+-- ถ้าเคยเลือกถาวรแล้ว ไม่ต้องสร้าง UI อีก
+if LANG_STATE.permanent and LANG_STATE.game then
+    return
+end
 
 local currentUILang     = LANG_STATE.ui
 local selectedGameLang  = LANG_STATE.game
@@ -352,21 +358,22 @@ for _, key in ipairs(ORDER) do
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
     flagFrame.Size = UDim2.new(1, 0, 0.7, 0)
-    flagFrame.BackgroundColor3 = THEME.WHITE
+    flagFrame.BackgroundColor3 = THEME.BLACK
+    flagFrame.BackgroundTransparency = 1 -- ไม่มีพื้นหลังขาว
     flagFrame.BorderSizePixel = 0
-    corner(flagFrame, 8)
+    corner(flagFrame, 10)
 
-    -- ใช้รูปธงในช่องสีขาว (ไม่มีอิโมจิ)
     local flagImage = Instance.new("ImageLabel")
     flagImage.Name = "FlagImage"
     flagImage.Parent = flagFrame
     flagImage.BackgroundTransparency = 1
-    flagImage.Size = UDim2.new(1, -6, 1, -6)
-    flagImage.Position = UDim2.new(0, 3, 0, 3)
+    flagImage.Size = UDim2.new(1, 0, 1, 0)
+    flagImage.Position = UDim2.new(0, 0, 0, 0)
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
+    corner(flagImage, 10)
 
-    local flagStroke = stroke(flagFrame, 0, THEME.GREEN)
+    local flagStroke = stroke(flagFrame, 0, THEME.GREEN, 1) -- ใช้เป็นเอฟเฟกต์เลือก
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
@@ -455,13 +462,14 @@ for key, data in pairs(cardMap) do
 end
 
 ------------------------------------------------------------
--- ปุ่ม Confirm: เซฟภาษาเกม + โหลดสคริปต์ดาวน์โหลด + ปิด UI
+-- CONFIRM DIALOG (ถามยืนยัน + ตัวเลือกถาวร)
 ------------------------------------------------------------
-confirmBtn.MouseButton1Click:Connect(function()
+local function applyFinalLanguageSelection(makePermanent)
     LANG_STATE.game = selectedGameLang
     LANG_STATE.ui   = currentUILang
+    LANG_STATE.permanent = makePermanent and true or LANG_STATE.permanent
 
-    print("[UFO HUB X] Game Language =", selectedGameLang, "UI Language =", currentUILang)
+    print("[UFO HUB X] Game Language =", selectedGameLang, "UI Language =", currentUILang, "Permanent =", LANG_STATE.permanent)
 
     local url = DOWNLOAD_URL[selectedGameLang]
     if url then
@@ -474,6 +482,130 @@ confirmBtn.MouseButton1Click:Connect(function()
     end
 
     gui.Enabled = false
+end
+
+local function openConfirmDialog()
+    local overlay = Instance.new("Frame")
+    overlay.Name = "ConfirmOverlay"
+    overlay.Parent = gui
+    overlay.Size = UDim2.new(1, 0, 1, 0)
+    overlay.BackgroundColor3 = THEME.BLACK
+    overlay.BackgroundTransparency = 0.35
+    overlay.BorderSizePixel = 0
+    overlay.ZIndex = 100
+
+    local panel = Instance.new("Frame")
+    panel.Name = "ConfirmPanel"
+    panel.Parent = overlay
+    panel.AnchorPoint = Vector2.new(0.5, 0.5)
+    panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+    panel.Size = UDim2.new(0, 440, 0, 210)
+    panel.BackgroundColor3 = THEME.BLACK
+    panel.BorderSizePixel = 0
+    panel.ZIndex = 101
+    corner(panel, 16)
+    stroke(panel, 2.6, THEME.GREEN, 0)
+
+    -- ข้อความคำถาม (พื้นที่เดิมสีเหลือง)
+    local question = Instance.new("TextLabel")
+    question.Parent = panel
+    question.BackgroundColor3 = THEME.BLACK
+    question.BorderSizePixel = 0
+    question.Size = UDim2.new(1, -16, 0, 80)
+    question.Position = UDim2.new(0, 8, 0, 10)
+    question.ZIndex = 102
+    corner(question, 10)
+    stroke(question, 1.8, THEME.GREEN, 0.1)
+    question.Font = Enum.Font.GothamBold
+    question.TextSize = 16
+    question.TextColor3 = THEME.WHITE
+    question.TextWrapped = true
+    question.TextYAlignment = Enum.TextYAlignment.Center
+    question.TextXAlignment = Enum.TextXAlignment.Center
+
+    local langName = (NAME_I18N["EN"] and NAME_I18N["EN"][selectedGameLang]) or BASE_NAMES[selectedGameLang] or selectedGameLang
+    question.Text = "Are you sure you want to use ".. tostring(langName) .." as your default language?"
+
+    -- ปุ่ม Permanent (ช่องสีส้มเดิม)
+    local permanent = false
+
+    local permBtn = Instance.new("TextButton")
+    permBtn.Name = "Permanent"
+    permBtn.Parent = panel
+    permBtn.BackgroundColor3 = THEME.BLACK
+    permBtn.BorderSizePixel = 0
+    permBtn.Size = UDim2.new(1, -16, 0, 40)
+    permBtn.Position = UDim2.new(0, 8, 0, 100)
+    permBtn.ZIndex = 102
+    permBtn.AutoButtonColor = false
+    corner(permBtn, 10)
+    stroke(permBtn, 1.8, THEME.GREEN, 0.1)
+    permBtn.Font = Enum.Font.Gotham
+    permBtn.TextSize = 14
+    permBtn.TextColor3 = THEME.WHITE
+    permBtn.TextWrapped = true
+    permBtn.TextXAlignment = Enum.TextXAlignment.Left
+
+    local function updatePermText()
+        local icon = permanent and "✅" or "☐"
+        permBtn.Text = icon .. "  Tick this if you don't want the language selection screen to show again. This will make this language permanent."
+    end
+    updatePermText()
+
+    permBtn.MouseButton1Click:Connect(function()
+        permanent = not permanent
+        updatePermText()
+    end)
+
+    -- ปุ่ม Confirm / Cancel (ฟ้า / แดงเดิม)
+    local confirm = Instance.new("TextButton")
+    confirm.Name = "Confirm"
+    confirm.Parent = panel
+    confirm.BackgroundColor3 = THEME.BLACK
+    confirm.BorderSizePixel = 0
+    confirm.Size = UDim2.new(0.48, -10, 0, 36)
+    confirm.Position = UDim2.new(0, 8, 1, -46)
+    confirm.ZIndex = 102
+    confirm.AutoButtonColor = false
+    confirm.Font = Enum.Font.GothamBold
+    confirm.TextSize = 14
+    confirm.TextColor3 = THEME.WHITE
+    confirm.Text = "Confirm"
+    corner(confirm, 10)
+    stroke(confirm, 2.0, THEME.GREEN, 0)
+
+    local cancel = Instance.new("TextButton")
+    cancel.Name = "Cancel"
+    cancel.Parent = panel
+    cancel.BackgroundColor3 = THEME.BLACK
+    cancel.BorderSizePixel = 0
+    cancel.Size = UDim2.new(0.48, -10, 0, 36)
+    cancel.Position = UDim2.new(1, -8, 1, -46)
+    cancel.AnchorPoint = Vector2.new(1, 0)
+    cancel.ZIndex = 102
+    cancel.AutoButtonColor = false
+    cancel.Font = Enum.Font.GothamBold
+    cancel.TextSize = 14
+    cancel.TextColor3 = THEME.WHITE
+    cancel.Text = "Cancel"
+    corner(cancel, 10)
+    stroke(cancel, 2.0, THEME.GREEN, 0)
+
+    confirm.MouseButton1Click:Connect(function()
+        overlay:Destroy()
+        applyFinalLanguageSelection(permanent)
+    end)
+
+    cancel.MouseButton1Click:Connect(function()
+        overlay:Destroy()
+    end)
+end
+
+------------------------------------------------------------
+-- ปุ่ม Confirm: เปิดหน้าต่างยืนยัน (ไม่โหลดทันที)
+------------------------------------------------------------
+confirmBtn.MouseButton1Click:Connect(function()
+    openConfirmDialog()
 end)
 
 ------------------------------------------------------------
@@ -510,16 +642,18 @@ local function openSettings()
     settingsOverlay.Parent = gui
     settingsOverlay.BackgroundTransparency = 1
     settingsOverlay.Size = UDim2.new(1, 0, 1, 0)
+    settingsOverlay.ZIndex = 50
 
     local panel = Instance.new("Frame")
     panel.Name = "Panel"
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
-    -- เลื่อนลงมานิดหน่อยให้บาลานซ์กับ UI หลัก
-    panel.Position = UDim2.new(1, -20, 0.56, 0)
-    panel.Size = UDim2.new(0, 260, 0.52, 0)
+    -- ขยับตำแหน่ง / ขนาด ให้ดูซูมขึ้นและไม่กว้างเกินไป
+    panel.Position = UDim2.new(1, -24, 0.52, 0)
+    panel.Size = UDim2.new(0, 230, 0.5, 0)
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel  = 0
+    panel.ZIndex = 51
     corner(panel, 18)
     stroke(panel, 2.4, THEME.GREEN)
 
@@ -528,6 +662,7 @@ local function openSettings()
     body.BackgroundTransparency = 1
     body.Size = UDim2.new(1, -10, 1, -10)
     body.Position = UDim2.new(0, 5, 0, 5)
+    body.ZIndex = 52
 
     local uiLangMap = UI_LANG_LABEL[currentUILang] or UI_LANG_LABEL["EN"]
 
@@ -541,6 +676,7 @@ local function openSettings()
     title.TextColor3 = THEME.WHITE
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Text = uiLangMap.TITLE or "UI Language"
+    title.ZIndex = 53
 
     -- Search (A V2)
     local searchBox = Instance.new("TextBox")
@@ -556,6 +692,7 @@ local function openSettings()
     searchBox.Text = ""
     searchBox.Size = UDim2.new(1, -8, 0, 30)
     searchBox.Position = UDim2.new(0, 4, 0, 26)
+    searchBox.ZIndex = 53
     corner(searchBox, 10)
     local sbStroke = stroke(searchBox, 1.8, THEME.GREEN_DARK, 0.3)
 
@@ -570,6 +707,7 @@ local function openSettings()
     list.AutomaticCanvasSize = Enum.AutomaticSize.Y
     list.ScrollingDirection = Enum.ScrollingDirection.Y
     list.ClipsDescendants = true
+    list.ZIndex = 53
 
     local layout = Instance.new("UIListLayout")
     layout.Parent = list
@@ -578,10 +716,10 @@ local function openSettings()
 
     local pad = Instance.new("UIPadding")
     pad.Parent = list
-    pad.PaddingTop = UDim2.new(0, 6)
-    pad.PaddingBottom = UDim2.new(0, 6)
-    pad.PaddingLeft = UDim2.new(0, 4)
-    pad.PaddingRight = UDim2.new(0, 4)
+    pad.PaddingTop = UDim.new(0, 6)
+    pad.PaddingBottom = UDim.new(0, 6)
+    pad.PaddingLeft = UDim.new(0, 4)
+    pad.PaddingRight = UDim.new(0, 4)
 
     local locking = false
     list:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
@@ -613,6 +751,20 @@ local function openSettings()
         end
     end
 
+    local function refreshCountryLabelsFromOverlay()
+        local uiLang = currentUILang
+        local map = NAME_I18N[uiLang] or NAME_I18N["EN"]
+        for _, key in ipairs(ORDER) do
+            local data = cardMap[key]
+            if data then
+                local txt = (map and map[key]) or BASE_NAMES[key] or key
+                data.name.Text = withFlag(key, txt)
+            end
+        end
+        local labelMap2 = UI_LANG_LABEL[uiLang] or UI_LANG_LABEL["EN"]
+        confirmBtn.Text = labelMap2.CONFIRM or "Confirm"
+    end
+
     local function applyOverlayLanguageTexts()
         uiLangMap = UI_LANG_LABEL[currentUILang] or UI_LANG_LABEL["EN"]
         title.Text = uiLangMap.TITLE or "UI Language"
@@ -621,7 +773,7 @@ local function openSettings()
             local base = uiLangMap[code] or BASE_NAMES[code] or code
             info.btn.Text = withFlag(code, base)
         end
-        refreshCountryLabels()
+        refreshCountryLabelsFromOverlay()
     end
 
     local function makeOption(langKey)
@@ -639,6 +791,7 @@ local function openSettings()
         btn.TextYAlignment = Enum.TextYAlignment.Center
         local base = uiLangMap[langKey] or BASE_NAMES[langKey] or langKey
         btn.Text = withFlag(langKey, base)
+        btn.ZIndex = 54
         corner(btn, 10)
 
         local st = stroke(btn, 1.6, THEME.GREEN_DARK, 0.4)
@@ -651,6 +804,7 @@ local function openSettings()
         glow.Size = UDim2.new(0, 3, 1, 0)
         glow.Position = UDim2.new(0, 0, 0, 0)
         glow.Visible = false
+        glow.ZIndex = 55
 
         langButtons[langKey] = {
             btn   = btn,
