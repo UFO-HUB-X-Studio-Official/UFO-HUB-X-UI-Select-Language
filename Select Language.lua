@@ -414,30 +414,27 @@ end
 updateSettingsVisual(false)
 
 ------------------------------------------------------------
--- TITLE "UFO HUB X" (สูงขึ้นอีกแบบสุดขอบบน)
+-- TITLE "UFO HUB X" (สูงขึ้นกว่าเดิมอีก)
 ------------------------------------------------------------
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "Title"
 titleLabel.Parent = main
 titleLabel.AnchorPoint = Vector2.new(0.5, 0)
 
--- ⭐ ขยับขึ้นสูงสุดเท่าที่ UI อนุญาต
-titleLabel.Position = UDim2.new(0.5, 0, 0.00, 0)
+-- ⭐ ดันขึ้นด้วย offset -30 (ขึ้นไปด้านบน)
+titleLabel.Position = UDim2.new(0.5, 0, 0.00, -30)
 
--- ⭐ ปรับขนาดให้สูงขึ้นรองรับฟอนต์ใหญ่
+-- ⭐ ปรับขนาดรองรับฟอนต์ใหญ่
 titleLabel.Size = UDim2.new(0.7, 0, 0, 105)
 
 titleLabel.BackgroundTransparency = 1
 titleLabel.Font = Enum.Font.GothamBlack
-
--- ⭐ ฟอนต์ใหญ่ ดูเป็นโลโก้เกมมากขึ้น
 titleLabel.TextSize = 56
-
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.RichText = true
 
--- ⭐ UFO สีขาว / HUB X สีเขียว
+-- ⭐ สีข้อความ UFO HUB X
 titleLabel.Text = '<font color="#FFFFFF">UFO </font><font color="#19FF7D">HUB X</font>'
 
 titleLabel.ZIndex = 10
