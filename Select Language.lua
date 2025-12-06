@@ -226,7 +226,7 @@ gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
 ------------------------------------------------------------
--- MAIN PANEL (ดำ + ขอบเขียว ปรับให้สูงขึ้นนิดหน่อย)
+-- MAIN PANEL
 ------------------------------------------------------------
 local main = Instance.new("Frame")
 main.Name = "Main"
@@ -239,7 +239,6 @@ main.BorderSizePixel = 0
 corner(main, 18)
 stroke(main, 3, THEME.GREEN_DARK, 0.1)
 
--- เส้นเรืองด้านใน
 local innerBorder = Instance.new("Frame")
 innerBorder.Parent = main
 innerBorder.BackgroundTransparency = 1
@@ -257,7 +256,6 @@ topBar.BackgroundTransparency = 1
 topBar.Size = UDim2.new(1, -24, 0, 26)
 topBar.Position = UDim2.new(0, 12, 0, 10)
 
--- ปุ่มปิด (แดง)
 local closeBtn = Instance.new("TextButton")
 closeBtn.Name = "Close"
 closeBtn.Parent = topBar
@@ -272,7 +270,6 @@ closeBtn.TextSize = 16
 closeBtn.TextColor3 = THEME.WHITE
 corner(closeBtn, 5)
 
--- ปุ่มตั้งค่าภาษา UI (พื้นดำ + ฟันเฟือง)
 local settingsBtn = Instance.new("TextButton")
 settingsBtn.Name = "Settings"
 settingsBtn.Parent = topBar
@@ -302,7 +299,7 @@ end
 updateSettingsVisual(false)
 
 ------------------------------------------------------------
--- GRID 6 ช่อง (ธง + ชื่อประเทศ) – จัดตรงกลางสวย ๆ
+-- GRID 6 ช่อง (ธง + ชื่อประเทศ)
 ------------------------------------------------------------
 local gridHolder = Instance.new("Frame")
 gridHolder.Name  = "GridHolder"
@@ -330,7 +327,6 @@ for _, key in ipairs(ORDER) do
     card.BackgroundTransparency = 1
     card.BorderSizePixel = 0
 
-    -- ปุ่มคลิกทั้งการ์ด
     local hit = Instance.new("TextButton")
     hit.Name = "Hit"
     hit.Parent = card
@@ -340,7 +336,6 @@ for _, key in ipairs(ORDER) do
     hit.Text = ""
     hit.AutoButtonColor = false
 
-    -- กรอบธง (ขาว) ด้านบน – ข้างในมี emoji ธง
     local flagFrame = Instance.new("Frame")
     flagFrame.Name = "FlagFrame"
     flagFrame.Parent = card
@@ -360,11 +355,9 @@ for _, key in ipairs(ORDER) do
     flagLabel.TextSize = 32
     flagLabel.TextColor3 = THEME.BLACK
     flagLabel.Text = FLAG[key] or ""
-    flagLabel.TextWrapped = false
 
     local flagStroke = stroke(flagFrame, 0, THEME.GREEN)
 
-    -- ชื่อประเทศด้านล่าง (มีอิโมจิธง)
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
     nameLabel.Parent = card
@@ -388,7 +381,7 @@ for _, key in ipairs(ORDER) do
 end
 
 ------------------------------------------------------------
--- ปุ่ม Confirm (ดำ + ขอบเขียวเรืองแสง)
+-- ปุ่ม Confirm
 ------------------------------------------------------------
 local confirmBtn = Instance.new("TextButton")
 confirmBtn.Name = "Confirm"
@@ -452,7 +445,7 @@ for key, data in pairs(cardMap) do
 end
 
 ------------------------------------------------------------
--- ปุ่ม Confirm: เซฟภาษาเกม + เปิดหน้าดาวน์โหลด + ปิด UI
+-- ปุ่ม Confirm: เซฟภาษาเกม + โหลดสคริปต์ดาวน์โหลด + ปิด UI
 ------------------------------------------------------------
 confirmBtn.MouseButton1Click:Connect(function()
     LANG_STATE.game = selectedGameLang
@@ -474,14 +467,14 @@ confirmBtn.MouseButton1Click:Connect(function()
 end)
 
 ------------------------------------------------------------
--- ปุ่ม Close: ปิดโดยไม่เปลี่ยนค่า
+-- ปุ่ม Close
 ------------------------------------------------------------
 closeBtn.MouseButton1Click:Connect(function()
     gui.Enabled = false
 end)
 
 ------------------------------------------------------------
--- แผง Settings (Model A V2 style เต็มระบบ) สำหรับเปลี่ยนภาษาของ UI
+-- แผง Settings (Model A V2 style) สำหรับเปลี่ยนภาษาของ UI
 ------------------------------------------------------------
 local settingsOverlay
 local settingsConn
@@ -513,7 +506,7 @@ local function openSettings()
     panel.Parent = settingsOverlay
     panel.AnchorPoint = Vector2.new(1, 0.5)
     panel.Position = UDim2.new(1, -20, 0.5, 0)
-    panel.Size = UDim2.new(0, 260, 0.55, 0) -- ลดความสูงให้เท่า Model A V2 มากขึ้น
+    panel.Size = UDim2.new(0, 260, 0.52, 0) -- ลดความสูงให้ดูพอดีแบบ A V2
     panel.BackgroundColor3 = THEME.BLACK
     panel.BorderSizePixel  = 0
     corner(panel, 18)
@@ -577,7 +570,7 @@ local function openSettings()
     pad.PaddingTop = UDim.new(0, 6)
     pad.PaddingBottom = UDim.new(0, 6)
     pad.PaddingLeft = UDim.new(0, 4)
-    pad.PaddingRight = UDim2.new(0, 4)
+    pad.PaddingRight = UDim.new(0, 4)
 
     local locking = false
     list:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
