@@ -392,38 +392,51 @@ for _, key in ipairs(ORDER) do
     hit.Text = ""
     hit.AutoButtonColor = false
 
+    -- กรอบใหญ่เท่าเดิม (ให้รูปใหญ่เหมือนเวอร์ชันที่ชอบ)
     local flagFrame = Instance.new("Frame")
     flagFrame.Name = "FlagFrame"
     flagFrame.Parent = card
     flagFrame.AnchorPoint = Vector2.new(0.5, 0)
     flagFrame.Position = UDim2.new(0.5, 0, 0, 0)
-    -- ปรับให้กรอบเขียวสั้นลง ฟิตกับรูปมากขึ้น
-    flagFrame.Size = UDim2.new(0.78, 0, 0.70, 0)
+    flagFrame.Size = UDim2.new(0.88, 0, 0.78, 0)
     flagFrame.BackgroundColor3 = THEME.BLACK
     flagFrame.BackgroundTransparency = 1
     flagFrame.BorderSizePixel = 0
     corner(flagFrame, 10)
 
+    -- กรอบด้านในสำหรับเส้นเขียว (สั้นลงนิดนึงให้ฟิตกับรูป)
+    local strokeFrame = Instance.new("Frame")
+    strokeFrame.Name = "StrokeFrame"
+    strokeFrame.Parent = flagFrame
+    strokeFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    strokeFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    -- ลดซ้ายขวานิดหน่อยให้ไม่ยาวจนติดขอบ card
+    strokeFrame.Size = UDim2.new(0.93, 0, 0.93, 0)
+    strokeFrame.BackgroundTransparency = 1
+    strokeFrame.BorderSizePixel = 0
+    corner(strokeFrame, 10)
+
     local flagImage = Instance.new("ImageLabel")
     flagImage.Name = "FlagImage"
-    flagImage.Parent = flagFrame
+    flagImage.Parent = strokeFrame
     flagImage.BackgroundTransparency = 1
     flagImage.AnchorPoint = Vector2.new(0.5, 0.5)
     flagImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    flagImage.Size = UDim2.new(1, 0, 1, 0) -- ใช้เต็มกรอบเท่ากันทุกประเทศ
+    -- หดเข้าไป 2 px รอบด้าน ให้มีช่องว่างเล็ก ๆ ก่อนถึงเส้นเขียว
+    flagImage.Size = UDim2.new(1, -4, 1, -4)
     flagImage.ScaleType = Enum.ScaleType.Fit
     flagImage.Image = FLAG_IMAGE[key] or ""
     corner(flagImage, 10)
 
-    local flagStroke = stroke(flagFrame, 0, THEME.GREEN, 1) -- ใช้เป็นเอฟเฟกต์เลือก
+    local flagStroke = stroke(strokeFrame, 0, THEME.GREEN, 1) -- เอฟเฟกต์เลือก
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "Name"
     nameLabel.Parent = card
-    nameLabel.AnchorPoint = Vector2.new(0.5, 0)
-    -- เลื่อนลงมาจากธงให้มีระยะหายใจ
-    nameLabel.Position = UDim2.new(0.5, 0, 1, 4)
-    nameLabel.Size = UDim2.new(1, 0, 0.30, 0)
+    nameLabel.AnchorPoint = Vector2.new(0.5, 1)
+    -- ใช้แบบเดิม แต่ดันให้สูงขึ้นนิดหน่อยจากขอบล่างของ card
+    nameLabel.Position = UDim2.new(0.5, 0, 1, -2)
+    nameLabel.Size = UDim2.new(1, 0, 0.32, -2)
     nameLabel.BackgroundTransparency = 1
     nameLabel.Font = Enum.Font.GothamBold
     nameLabel.TextSize = 14
